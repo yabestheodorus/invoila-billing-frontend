@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+/*
+ * Invoila design system — Claude-inspired warm palette (cream + coral orange).
+ * Tokens are defined as CSS variables on :root (so they can flip in dark mode)
+ * and exposed to Tailwind via `@theme inline`, which generates utilities like
+ * `bg-background`, `text-foreground`, `text-muted`, `border-border`,
+ * `bg-primary`, `hover:bg-primary-hover`, `bg-surface`, `bg-accent`, `ring-ring`.
+ * See DESIGN_SYSTEM.md.
+ */
+:root {
+  /* Surfaces */
+  --background: #fdfdfc;
+  /* app canvas — Claude Desktop base surface */
+  --surface: #ffffff;
+  /* cards / panels */
+  --surface-muted: #f0eee6;
+  /* subtle cream fill */
+
+  /* Text */
+  --foreground: #262625;
+  /* warm near-black */
+  --muted: #6e6b66;
+  /* secondary text */
+
+  /* Lines */
+  --border: #e6e2d8;
+
+  /* Brand — Claude coral/terracotta */
+  --primary: #d97757;
+  --primary-hover: #c2613f;
+  --primary-foreground: #ffffff;
+  --accent: #f6ece5;
+  /* subtle orange tint (hover / selected) */
+  --accent-foreground: #8a4b32;
+
+  /* Focus ring */
+  --ring: #d97757;
+
+  /* Sidebar rail */
+  --sidebar: #ffffff;
+  /* side menu background */
+  --sidebar-active: #f4f4f1;
+  /* highlighted / selected menu item */
+
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-active: var(--sidebar-active);
+
+  --radius-base: var(--radius);
+
+  /* Inter = body, Plus Jakarta Sans = headings (set in app/layout.tsx). */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-plus-jakarta-sans);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1f1e1d;
+    --surface: #262625;
+    --surface-muted: #2e2c29;
+    --foreground: #f5f4ee;
+    --muted: #a6a199;
+    --border: #3a3733;
+    --primary: #e08a6b;
+    --primary-hover: #d97757;
+    --primary-foreground: #211a16;
+    --accent: #38302b;
+    --accent-foreground: #f0c9b6;
+    --ring: #e08a6b;
+    --sidebar: #232220;
+    --sidebar-active: #2e2c29;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), var(--font-sans), ui-sans-serif, system-ui,
+    sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Export to PDF: print only the invoice document (`.print-area`), hiding app
+   chrome and any `.no-print` controls. Triggered by the "Export PDF" button. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
