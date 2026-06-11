@@ -9,7 +9,7 @@ utilities — **use the tokens, not raw `neutral-*`/`blue-*`/hex values.**
 
 | Token | Utility examples | Light | Dark | Use for |
 |-------|------------------|-------|------|---------|
-| `background` | `bg-background` | `#FAF9F5` | `#1F1E1D` | App canvas |
+| `background` | `bg-background` | `#FDFDFC` | `#1F1E1D` | App canvas |
 | `surface` | `bg-surface` | `#FFFFFF` | `#262625` | Cards, panels, modals |
 | `surface-muted` | `bg-surface-muted` | `#F0EEE6` | `#2E2C29` | Subtle fills, hovers, code blocks |
 | `foreground` | `text-foreground` | `#262625` | `#F5F4EE` | Primary text |
@@ -27,7 +27,7 @@ Text opacity helpers still work: `text-foreground/60`, `text-foreground/40`, etc
 ## Typography
 
 - **Body:** Inter — `font-sans` (default).
-- **Headings:** Google Sans — applied to `h1`–`h6` automatically; use `font-heading` for non-heading display text (e.g. big numbers).
+- **Headings:** Plus Jakarta Sans — applied to `h1`–`h6` automatically; use `font-heading` for non-heading display text (e.g. big numbers).
 
 ## Patterns
 
@@ -59,7 +59,11 @@ Text opacity helpers still work: `text-foreground/60`, `text-foreground/40`, etc
   `border-neutral-200`, `bg-neutral-900`.
 - **One accent.** Orange (`primary`) is the only brand accent — no indigo/blue.
 - **Radius:** cards `rounded-xl`/`rounded-2xl`, controls `rounded-lg`/`rounded-md`.
-- **Dark mode** flips automatically via `prefers-color-scheme` (tokens already defined).
+- **Dark mode is class-based:** tokens flip when `<html>` has `.dark`. A no-FOUC
+  script in [app/layout.tsx](app/layout.tsx) sets it from the saved choice (or the
+  OS preference on first visit); `ThemeToggle` (in the Topbar) flips and persists
+  it to `localStorage`. Use `dark:` utilities only for one-off tweaks — prefer
+  tokens, which already adapt.
 
 ## Migration status
 

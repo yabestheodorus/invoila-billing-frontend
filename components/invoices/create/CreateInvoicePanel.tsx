@@ -18,7 +18,7 @@ import { DraftMenu } from './DraftMenu';
 import { PreviewPane, type PreviewTab } from './preview/PreviewPane';
 import { addDaysISO, customerToParty, DEFAULT_VALUES, todayISO, toSubmitValues } from '@/lib/invoice-utils';
 import { getDraft, listDrafts, removeDraft, saveDraft, type InvoiceDraft } from '@/lib/draft-store';
-import type { PreviewData, Party } from '@/types/invoice';
+import type { InvoiceDetail, Party } from '@/types/invoice';
 import { invoiceSchema, type InvoiceFormValues } from '@/types/invoice-form';
 
 /** Top-level form keys owned by each step (for per-step validation gating). */
@@ -110,9 +110,11 @@ export function CreateInvoicePanel({
     // Computed per render (not frozen at module load): issued today, due in 20 days.
     meta: { issued: todayISO(), dueDate: addDaysISO(20) },
     from: fromParty ?? DEFAULT_VALUES.from,
-    ...(customers[0]
-      ? { to: customerToParty(customers[0]), customerId: customers[0].id }
-      : {}),
+    // ...(customers[0]
+    //   ? { to: customerToParty(customers[0]), customerId: customers[0].id }
+    //   : {}),
+
+      ...{},
   };
   const form = useInvoiceForm(
     initialValues,
@@ -247,7 +249,7 @@ export function CreateInvoicePanel({
               <PreviewPane
                 tab={tab}
                 onTabChange={setTab}
-                data={buildPreview(values)}
+                data={draftInvoiceDetail(values)}
                 message={values.message ?? ''}
               />
             )}
@@ -258,19 +260,44 @@ export function CreateInvoicePanel({
   );
 }
 
-/** Derive the preview view-model (totals included) from raw form values. */
-function buildPreview(v: InvoiceFormValues): PreviewData {
+/**
+ * Build a *draft* invoice-detail from live form values, so the create preview
+ * renders through the exact same `InvoiceDetail` shape the API returns (no
+ * separate preview DTO). The `invoice` block is a placeholder — there's no
+ * persisted invoice yet, so it carries empty/neutral values and an empty number
+ * (which the document shows as "Draft").
+ */
+function draftInvoiceDetail(v: InvoiceFormValues): InvoiceDetail {
   const subtotal = v.items.reduce((sum, i) => sum + i.qty * i.price, 0);
   const discountAmount = Math.round((subtotal * v.discountPct) / 100);
+  const total = subtotal - discountAmount;
   return {
+    invoice: {
+      id: '',
+      invoiceNumber: '',
+      payToken: '',
+      customerName: v.to.name,
+      customerEmail: v.to.email,
+      amount: total,
+      description: v.items[0]?.description ?? '',
+      status: 'pending',
+      dueDate: v.meta.dueDate,
+      createdAt: v.meta.issued,
+      paidAt: null,
+      emailSentAt: null,
+      emailReceivedAt: null,
+      emailReadAt: null,
+      emailClickedAt: null,
+    },
     from: v.from,
     to: v.to,
-    meta: v.meta,
     items: v.items,
     discountPct: v.discountPct,
     subtotal,
     discountAmount,
-    total: subtotal - discountAmount,
+    total,
+    amountDue: null,
     notes: v.notes ?? '',
+    billingSchedule: null,
   };
 }

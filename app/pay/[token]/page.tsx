@@ -9,9 +9,11 @@ type Props = { params: Promise<{ token: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { token } = await params;
-  const invoice = await getPayInvoice(token);
+  const detail = await getPayInvoice(token);
   return {
-    title: invoice ? `Pay ${invoice.invoiceNumber} · Invoila` : 'Invoice not found · Invoila',
+    title: detail
+      ? `Pay ${detail.invoice.invoiceNumber} · Invoila`
+      : 'Invoice not found · Invoila',
   };
 }
 
@@ -19,9 +21,9 @@ export default async function PayInvoicePage({ params }: Props) {
   const { token } = await params;
   // Reconcile with Midtrans first (catches a payment the webhook hasn't
   // delivered), falling back to a plain read if the sync call fails.
-  const invoice = (await syncPayInvoice(token)) ?? (await getPayInvoice(token));
+  const detail = (await syncPayInvoice(token)) ?? (await getPayInvoice(token));
 
-  if (!invoice) {
+  if (!detail) {
     notFound();
   }
 
@@ -41,7 +43,7 @@ export default async function PayInvoicePage({ params }: Props) {
           <span className="font-heading text-lg font-semibold">Invoila</span>
         </div>
 
-        <PayInvoiceCard invoice={invoice} />
+        <PayInvoiceCard detail={detail} />
 
         <p className="mt-6 flex items-center gap-1.5 text-xs text-muted">
           <FiShield className="size-3.5" /> Payments secured by Midtrans

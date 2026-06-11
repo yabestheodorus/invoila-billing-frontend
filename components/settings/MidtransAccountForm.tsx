@@ -1,15 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { FiCheckCircle } from 'react-icons/fi';
+import { FiArrowRight, FiCheckCircle, FiHelpCircle } from 'react-icons/fi';
 import { saveMidtransAccount } from '@/lib/api/midtrans-account';
 import type {
   MidtransAccountView,
   MidtransEnvironment,
 } from '@/types/midtrans-account';
 import { Field, buttonClass, labelClass } from './form-ui';
+
+/** Step-by-step guides on the onboarding page, deep-linked by `?step=`. */
+const GUIDE_LINKS = [
+  { step: 'midtrans-register', label: 'Register a Midtrans account' },
+  { step: 'midtrans-account', label: 'Find & connect your keys' },
+  { step: 'webhook', label: 'Set the payment notification URL' },
+] as const;
 
 /**
  * Settings — connect the user's own Midtrans merchant so payments settle to
@@ -64,6 +72,26 @@ export function MidtransAccountForm({
           to your account. Find these under Midtrans Dashboard → Settings → Access
           Keys.
         </p>
+
+        {/* Deep links into the step-by-step onboarding guides. */}
+        <div className="mb-5 rounded-lg border border-border bg-surface-muted p-4">
+          <p className="flex items-center gap-2 text-sm font-medium">
+            <FiHelpCircle className="size-4 text-primary" />
+            New to Midtrans? Follow the setup guide
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {GUIDE_LINKS.map(({ step, label }) => (
+              <Link
+                key={step}
+                href={`/onboarding?step=${step}`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground"
+              >
+                {label}
+                <FiArrowRight className="size-3.5" />
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {initialAccount?.serverKeyConfigured && (
           <div className="mb-5 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-sm text-emerald-800 ring-1 ring-inset ring-emerald-200">

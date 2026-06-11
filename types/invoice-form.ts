@@ -16,6 +16,8 @@ export const partySchema = z.object({
   // without a required marker, and the read-only "From" profile may have none.
   postal: z.string().optional(),
   country: z.string().min(1, 'Required'),
+  // Business logo URL — snapshotted on the "From" party; mirror of the backend.
+  logoUrl: z.string().optional(),
 });
 
 export const itemSchema = z.object({

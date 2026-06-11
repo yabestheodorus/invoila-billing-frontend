@@ -1,13 +1,20 @@
 import { formatIDR } from '@/lib/format';
 import { shortDate } from '@/lib/invoice-utils';
-import type { PreviewData } from '@/types/invoice';
+import type { InvoiceDetail } from '@/types/invoice';
 import { PartyView } from './PartyView';
 
 /* ── Email tab: the email preview ────────────────────── */
-export function EmailPreview({ data, message }: { data: PreviewData; message: string }) {
-  const senderName = data.from.name.trim() || 'Invoila';
+export function EmailPreview({
+  detail,
+  message,
+}: {
+  detail: InvoiceDetail;
+  message: string;
+}) {
+  const { invoice, from, to, items } = detail;
+  const senderName = from.name.trim() || 'Invoila';
   const body = message.trim().split('\n').map((l) => l.trim()).filter(Boolean).join(' ');
-  const due = shortDate(data.meta.dueDate);
+  const due = shortDate(invoice.dueDate);
 
   return (
     <div className="mx-auto max-w-xl overflow-hidden rounded-xl bg-surface shadow-sm ring-1 ring-border">
@@ -23,7 +30,7 @@ export function EmailPreview({ data, message }: { data: PreviewData; message: st
       <dl className="space-y-1 border-b border-border px-5 py-4 text-[11px] text-muted ">
         <div className="flex gap-2">
           <dt className="w-16 shrink-0 uppercase tracking-wide">To:</dt>
-          <dd className="text-foreground">{data.to.email || '—'}</dd>
+          <dd className="text-foreground">{to.email || '—'}</dd>
         </div>
         <div className="flex gap-2">
           <dt className="w-16 shrink-0 uppercase tracking-wide">Subject:</dt>
@@ -51,10 +58,10 @@ export function EmailPreview({ data, message }: { data: PreviewData; message: st
         {/* big amount / due */}
         <div className="mt-8 text-center">
           <p className="text-[11px] uppercase tracking-wide text-muted">
-            Invoice #{data.meta.invoiceNo || '—'}
+            Invoice #{invoice.invoiceNumber || '—'}
           </p>
           <p className="mt-1 font-heading text-5xl font-bold tracking-tight tabular-nums">
-            {formatIDR(data.total)}
+            {formatIDR(detail.total)}
           </p>
           {due && <p className="mt-1 text-xl font-medium text-muted">due {due}</p>}
         </div>
@@ -70,8 +77,8 @@ export function EmailPreview({ data, message }: { data: PreviewData; message: st
         <div className="mx-4 rounded-2xl border border-border bg-surface p-8">
           {/* from / to */}
           <div className=" grid grid-cols-2 gap-6 ">
-            <PartyView label="From" party={data.from} compact />
-            <PartyView label="To" party={data.to} compact />
+            <PartyView label="From" party={from} compact />
+            <PartyView label="To" party={to} compact />
           </div>
 
           {/* invoice details */}
@@ -80,26 +87,26 @@ export function EmailPreview({ data, message }: { data: PreviewData; message: st
               Invoice details
             </p>
             <dl className="mt-3 space-y-2.5 text-sm">
-              {data.items.map((item) => (
+              {items.map((item) => (
                 <div key={item.id} className="flex justify-between gap-4">
                   <dt className="text-foreground">{item.description || '—'}</dt>
                   <dd className="tabular-nums">{formatIDR(item.qty * item.price)}</dd>
                 </div>
               ))}
               <div className="flex justify-between text-muted">
-                <dt>Discount ({data.discountPct}%)</dt>
-                <dd className="tabular-nums">-{formatIDR(data.discountAmount)}</dd>
+                <dt>Discount ({detail.discountPct}%)</dt>
+                <dd className="tabular-nums">-{formatIDR(detail.discountAmount)}</dd>
               </div>
               <div className="flex justify-between border-t border-border pt-2.5 font-semibold">
                 <dt>Total due</dt>
-                <dd className="tabular-nums">{formatIDR(data.total)}</dd>
+                <dd className="tabular-nums">{formatIDR(detail.total)}</dd>
               </div>
             </dl>
 
-            {data.notes && (
+            {detail.notes && (
               <div className="mt-4 space-y-1 text-[11px] leading-relaxed text-muted">
                 <p className="font-medium uppercase tracking-wide">Notes</p>
-                <p className="whitespace-pre-line">{data.notes}</p>
+                <p className="whitespace-pre-line">{detail.notes}</p>
               </div>
             )}
           </div>

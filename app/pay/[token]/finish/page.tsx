@@ -55,10 +55,11 @@ export default async function PaymentFinishPage({ params, searchParams }: Props)
 
   // The payer just returned from checkout — reconcile with Midtrans so the
   // invoice reflects the payment even if the webhook hasn't landed yet.
-  const invoice = (await syncPayInvoice(token)) ?? (await getPayInvoice(token));
-  if (!invoice) {
+  const detail = (await syncPayInvoice(token)) ?? (await getPayInvoice(token));
+  if (!detail) {
     notFound();
   }
+  const { invoice } = detail;
 
   const view = resolveView(invoice.status === 'paid', transaction_status);
   const Icon = view.icon;

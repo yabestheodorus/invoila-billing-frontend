@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import type { Invoice } from '@/types/invoice';
+import type { InvoiceDetail } from '@/types/invoice';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -7,12 +7,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
  * Unauthenticated API reads for public pages (the customer pay page). Unlike
  * `serverFetch`, these send no Supabase token — the payer follows a shared link
  * and isn't signed in. Returns null on any failure so the page can 404 cleanly.
+ *
+ * Returns the full invoice detail (parties, items, totals, `amountDue`) so the
+ * pay page renders the same document; `billingSchedule` is always null here (the
+ * public endpoint omits the sibling list).
  */
-export const getPayInvoice = cache(async (token: string): Promise<Invoice | null> => {
+export const getPayInvoice = cache(async (token: string): Promise<InvoiceDetail | null> => {
   try {
     const res = await fetch(`${API_URL}/invoices/pay/${token}`, { cache: 'no-store' });
     if (!res.ok) return null;
-    return (await res.json()) as Invoice;
+    return (await res.json()) as InvoiceDetail;
   } catch {
     return null;
   }
@@ -25,14 +29,14 @@ export const getPayInvoice = cache(async (token: string): Promise<Invoice | null
  * even if the async webhook hasn't reached us. Returns null on any failure so
  * the caller can fall back to {@link getPayInvoice}.
  */
-export async function syncPayInvoice(token: string): Promise<Invoice | null> {
+export async function syncPayInvoice(token: string): Promise<InvoiceDetail | null> {
   try {
     const res = await fetch(`${API_URL}/payments/sync/${token}`, {
       method: 'POST',
       cache: 'no-store',
     });
     if (!res.ok) return null;
-    return (await res.json()) as Invoice;
+    return (await res.json()) as InvoiceDetail;
   } catch {
     return null;
   }

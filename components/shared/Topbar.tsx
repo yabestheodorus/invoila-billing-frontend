@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { FiSearch } from 'react-icons/fi';
 import { Avatar } from './Avatar';
+import { ThemeToggle } from './ThemeToggle';
 
 const LABELS: { match: string; label: string }[] = [
   { match: '/dashboard', label: 'Overview' },
@@ -31,6 +32,7 @@ export function Topbar({ userName }: { userName: string }) {
       </div>
 
       <div className="ml-auto flex items-center gap-2.5">
+        <ThemeToggle />
         <Avatar name={userName} className="size-8" />
         <span className="hidden text-sm font-medium md:inline">{userName}</span>
       </div>

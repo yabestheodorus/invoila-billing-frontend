@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { PreviewData } from '@/types/invoice';
+import type { InvoiceDetail } from '@/types/invoice';
 import { XIcon } from '../icons';
 import { InvoiceDocument } from './InvoiceDocument';
 import { EmailPreview } from './EmailPreview';
@@ -15,7 +15,7 @@ export function PreviewPane({
 }: {
   tab: PreviewTab;
   onTabChange: (tab: PreviewTab) => void;
-  data: PreviewData;
+  data: InvoiceDetail;
   message: string;
 }) {
   return (
@@ -43,9 +43,9 @@ export function PreviewPane({
         }}
       >
         {tab === 'invoice' ? (
-          <InvoiceDocument data={data} />
+          <InvoiceDocument detail={data} />
         ) : (
-          <EmailPreview data={data} message={message} />
+          <EmailPreview detail={data} message={message} />
         )}
       </div>
     </div>

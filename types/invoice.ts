@@ -1,8 +1,10 @@
 /**
- * Invoice domain — entities and read models. Types only (no zod, no runtime).
- * Create-side validation lives in `types/invoice-form.ts`; values and helpers
- * live in `lib/invoice.ts`.
+ * Invoice domain — entities and read models. Shared shapes (`Party`, `LineItem`)
+ * are inferred from their single source of truth: the zod schemas in
+ * `types/invoice-form.ts`. Values/helpers live in `lib/invoice-utils.ts`.
  */
+import { z } from 'zod';
+import { partySchema, itemSchema } from './invoice-form';
 
 export type InvoiceStatus = 'pending' | 'paid' | 'overdue';
 
@@ -18,24 +20,14 @@ export interface InvoiceSummary {
   overdueCount: number;
 }
 
-/** A billable party — the invoice "From" (business) or "Bill to" (customer). */
-export interface Party {
-  name: string;
-  email: string;
-  line1: string;
-  line2?: string;
-  city: string;
-  postal?: string;
-  country: string;
-}
+/**
+ * A billable party — the invoice "From" (business) or "Bill to" (customer).
+ * Single source of truth = `partySchema` (zod) in `types/invoice-form.ts`.
+ */
+export type Party = z.infer<typeof partySchema>;
 
-/** A single line item on an invoice. */
-export interface LineItem {
-  id: string;
-  description: string;
-  qty: number;
-  price: number;
-}
+/** A single line item on an invoice (inferred from `itemSchema`). */
+export type LineItem = z.infer<typeof itemSchema>;
 
 /**
  * One custom payment term (deposit + balance / milestone payments). The total
@@ -61,19 +53,13 @@ export type InvoiceSchedule =
   | { type: 'installments'; count: number; interval: 'weekly' | 'monthly' }
   | { type: 'deposit_balance'; terms: ScheduleTerm[] };
 
-/** Everything the shared invoice document / preview needs to render. */
-export interface PreviewData {
-  from: Party;
-  to: Party;
-  // invoiceNo is only present once the backend has assigned it (detail view);
-  // the create-form live preview has no number yet.
-  meta: { invoiceNo?: string; issued: string; dueDate: string };
-  items: LineItem[];
-  discountPct: number;
-  subtotal: number;
-  discountAmount: number;
-  total: number;
-  notes: string;
+/** The slice a scheduled invoice bills within its order (absent for one-time). */
+export interface AmountDue {
+  /** e.g. "Installment 2 of 3", a term label, or "Recurring (monthly)". */
+  label: string;
+  amount: number;
+  /** ISO date string (yyyy-mm-dd). */
+  dueDate: string;
 }
 
 /**
@@ -138,6 +124,8 @@ export interface InvoiceDetail {
   subtotal: number;
   discountAmount: number;
   total: number;
+  /** This invoice's portion within its schedule; null for one-time invoices. */
+  amountDue: AmountDue | null;
   notes: string;
   /** Null for standalone one-time invoices. */
   billingSchedule: (BillingSchedule & { invoices: Invoice[] }) | null;

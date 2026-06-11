@@ -7,27 +7,7 @@ import { PaymentScheduleCard } from '@/components/invoices/PaymentScheduleCard';
 import { InvoiceActivityTimeline } from '@/components/invoices/InvoiceActivityTimeline';
 import { formatDate } from '@/lib/format';
 import type { TimelineEvent } from '@/types/activity';
-import type { InvoiceDetail as InvoiceDetailModel, PreviewData } from '@/types/invoice';
-
-/** Map the full invoice detail to the shape the shared `InvoiceDocument` renders. */
-function toPreview(detail: InvoiceDetailModel): PreviewData {
-  const { invoice } = detail;
-  return {
-    from: detail.from,
-    to: detail.to,
-    meta: {
-      invoiceNo: invoice.invoiceNumber,
-      issued: invoice.createdAt,
-      dueDate: invoice.dueDate,
-    },
-    items: detail.items,
-    discountPct: detail.discountPct,
-    subtotal: detail.subtotal,
-    discountAmount: detail.discountAmount,
-    total: detail.total,
-    notes: detail.notes,
-  };
-}
+import type { InvoiceDetail as InvoiceDetailModel } from '@/types/invoice';
 
 export function InvoiceDetail({
   detail,
@@ -37,7 +17,6 @@ export function InvoiceDetail({
   timeline: TimelineEvent[];
 }) {
   const { invoice } = detail;
-
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
       {/* ── Left: invoice info (header, actions, schedule, activity) ── */}
@@ -92,7 +71,7 @@ export function InvoiceDetail({
 
       {/* ── Right: the invoice document (also the only thing Export PDF prints) ── */}
       <div className="print-area lg:sticky lg:top-6">
-        <InvoiceDocument data={toPreview(detail)} />
+        <InvoiceDocument detail={detail} />
       </div>
     </div>
   );

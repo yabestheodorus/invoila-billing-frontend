@@ -20,6 +20,7 @@ export default async function NewInvoicePage() {
         city: profile.city,
         postal: profile.postal ?? '',
         country: profile.country,
+        logoUrl: profile.logoUrl ?? undefined,
       }
     : null;
 
