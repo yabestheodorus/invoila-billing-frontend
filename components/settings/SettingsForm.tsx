@@ -91,14 +91,16 @@ export function SettingsForm({ initialProfile }: { initialProfile: BusinessProfi
         <div className='flex gap-4'>
           <div className='flex w-1/2 flex-col items-center bg-surface-muted rounded-lg border border-border p-5'>
             <h2 className='text-sm font-semibold'>Invoice Logo</h2>
-            <CldImage
+
+            {form.logoUrl && (<CldImage
               src={form.logoUrl}
               width="250"
               height="150"
               crop="pad"
               alt="Logo"
               gravity="center"
-            />
+            />)}
+
 
 
           </div>
