@@ -92,17 +92,20 @@ export function SettingsForm({ initialProfile }: { initialProfile: BusinessProfi
           <div className='flex w-1/2 flex-col items-center bg-surface-muted rounded-lg border border-border p-5'>
             <h2 className='text-sm font-semibold'>Invoice Logo</h2>
 
-            {form.logoUrl && (<CldImage
-              src={form.logoUrl}
-              width="250"
-              height="150"
-              crop="pad"
-              alt="Logo"
-              gravity="center"
-            />)}
-
-
-
+            {form.logoUrl ? (
+              <CldImage
+                src={form.logoUrl}
+                width="250"
+                height="150"
+                crop="pad"
+                alt="Logo"
+                gravity="center"
+              />
+            ) : (
+              <div className="mt-3 flex h-37.5 w-62.5 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted">
+                No logo uploaded
+              </div>
+            )}
           </div>
           <div className='flex flex-col w-1/2 gap-4'>
             <Field label="Business name" value={form.name} onChange={set('name')} required placeholder="Invoila Studio" />
